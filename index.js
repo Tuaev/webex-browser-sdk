@@ -16,3 +16,43 @@ webex.meetings
     alert(err);
     throw err;
   });
+
+const bindMeetingEvents = (meeting) => {
+  meeting.on('error', (err) => console.error(err));
+
+  // Handle media streams changes to ready state
+  meeting.on('media:ready', (media) => {
+    if (!media) return;
+
+    if (media.type === 'local') {
+      document.querySelector('#self-view').srcObject = media.stream;
+    }
+
+    if (media.type === 'remoteVideo') {
+      document.querySelector('#remote-view-video').srcObject = media.stream;
+    }
+
+    if (media.type === 'remoteAudio') {
+      document.querySelector('#remote-view-audio').srcObject = media.stream;
+    }
+  });
+
+  // Handle media streams stopping
+  meeting.on('media:stopped', (media) => {
+    // Remove media streams
+    if (media.type === 'local') {
+      document.querySelector('#self-view').srcObject = null;
+    }
+    if (media.type === 'remoteVideo') {
+      document.querySelector('#remote-view-video').srcObject = null;
+    }
+    if (media.type === 'remoteAudio') {
+      document.querySelector('#remote-view-audio').srcObject = null;
+    }
+  });
+
+  // Handle leaving the meeting
+  document.querySelector('#hangup').addEventListener('click', () => {
+    meeting.leave();
+  });
+};
