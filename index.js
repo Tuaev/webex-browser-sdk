@@ -18,6 +18,7 @@ function listenForIncomingMeetings() {
         // Acknowledge to the server that we received the call on our device
         addedMeeting.acknowledge(addedMeetingEvent.type).then(() => {
           if (confirm('Answer incoming call')) {
+            bindMeetingEvents(addedMeeting);
             joinMeeting(addedMeeting);
           } else {
             addedMeeting.decline();
@@ -96,7 +97,6 @@ const joinMeeting = (meeting) => {
 // Get current meeting
 function getCurrentMeeting() {
   const meetings = webex.meetings.getAllMeetings();
-
   return meetings[Object.keys(meetings)[0]];
 }
 
@@ -135,19 +135,6 @@ document.querySelector('#destination').addEventListener('submit', (e) => {
     })
     .catch((err) => console.error(err));
 });
-
-// document.querySelector('#connect').addEventListener('click', (e) => {
-//   e.preventDefault();
-
-//   webex.meetings
-//     .register()
-//     .then(() => console.log('Connected'))
-//     .catch((err) => {
-//       console.error(err);
-//       alert(err);
-//       throw err;
-//     });
-// });
 
 const connectWebex = () => {
   webex.meetings
