@@ -8,15 +8,6 @@ const webex = window.Webex.init({
   },
 });
 
-webex.meetings
-  .register()
-  .then(() => console.log('Connected'))
-  .catch((err) => {
-    console.error(err);
-    alert(err);
-    throw err;
-  });
-
 const bindMeetingEvents = (meeting) => {
   meeting.on('error', (err) => console.error(err));
 
@@ -81,6 +72,36 @@ const joinMeeting = (meeting) => {
   });
 };
 
+// Get current meeting
+function getCurrentMeeting() {
+  const meetings = webex.meetings.getAllMeetings();
+
+  return meetings[Object.keys(meetings)[0]];
+}
+
+// Answer Incoming Call
+const answerMeeting = () => {
+  const meeting = getCurrentMeeting();
+
+  if (meeting) {
+    meeting.join().then(() => {
+      meeting.acknowledge('ANSWER', false);
+      bindMeetingEvents(meeting);
+      return joinMeeting(meeting);
+    });
+  }
+};
+
+// Reject Incoming Call
+const rejectMeeting = () => {
+  const meeting = getCurrentMeeting();
+
+  if (meeting) {
+    meeting.decline('BUSY');
+    toggleDisplay('incomingsection', false);
+  }
+};
+
 document.querySelector('#destination').addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -93,4 +114,17 @@ document.querySelector('#destination').addEventListener('submit', (e) => {
       return joinMeeting(meeting);
     })
     .catch((err) => console.error(err));
+});
+
+document.querySelector('#connect').addEventListener('click', (e) => {
+  e.preventDefault();
+
+  webex.meetings
+    .register()
+    .then(() => console.log('Connected'))
+    .catch((err) => {
+      console.error(err);
+      alert(err);
+      throw err;
+    });
 });
