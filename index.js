@@ -80,3 +80,17 @@ const joinMeeting = (meeting) => {
     });
   });
 };
+
+document.querySelector('#destination').addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const destination = document.querySelector('#invitee').value;
+
+  return webex.meetings
+    .create(destination)
+    .then((meeting) => {
+      bindMeetingEvents(meeting);
+      return joinMeeting(meeting);
+    })
+    .catch((err) => console.error(err));
+});
