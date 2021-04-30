@@ -56,3 +56,27 @@ const bindMeetingEvents = (meeting) => {
     meeting.leave();
   });
 };
+
+// Join the meeting and add media
+const joinMeeting = (meeting) => {
+  return meeting.join().then(() => {
+    const mediaSettings = {
+      receiveVideo: true,
+      receiveAudio: true,
+      receiveShare: false,
+      sendVideo: true,
+      sendAudio: true,
+      sendShare: false,
+    };
+
+    return meeting.getMediaStreams(mediaSettings).then((mediaStreams) => {
+      const [localStream, localShare] = mediaStreams;
+
+      meeting.addMedia({
+        localShare,
+        localStream,
+        mediaSettings,
+      });
+    });
+  });
+};
