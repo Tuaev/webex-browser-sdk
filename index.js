@@ -8,6 +8,27 @@ const webex = window.Webex.init({
   },
 });
 
+function listenForIncomingMeetings() {
+  return new Promise((resolve) => {
+    // Listen for added meetings
+    webex.meetings.on('meeting:added', (addedMeetingEvent) => {
+      if (addedMeetingEvent.type === 'INCOMING' || addedMeetingEvent.type === 'JOIN') {
+        const addedMeeting = addedMeetingEvent.meeting;
+
+        // Acknowledge to the server that we received the call on our device
+        addedMeeting.acknowledge(addedMeetingEvent.type).then(() => {
+          if (confirm('Answer incoming call')) {
+            joinMeeting(addedMeeting);
+          } else {
+            addedMeeting.decline();
+          }
+        });
+      }
+    });
+    resolve();
+  });
+}
+
 const bindMeetingEvents = (meeting) => {
   meeting.on('error', (err) => console.error(err));
 
@@ -98,7 +119,6 @@ const rejectMeeting = () => {
 
   if (meeting) {
     meeting.decline('BUSY');
-    toggleDisplay('incomingsection', false);
   }
 };
 
@@ -116,15 +136,29 @@ document.querySelector('#destination').addEventListener('submit', (e) => {
     .catch((err) => console.error(err));
 });
 
-document.querySelector('#connect').addEventListener('click', (e) => {
-  e.preventDefault();
+// document.querySelector('#connect').addEventListener('click', (e) => {
+//   e.preventDefault();
 
+//   webex.meetings
+//     .register()
+//     .then(() => console.log('Connected'))
+//     .catch((err) => {
+//       console.error(err);
+//       alert(err);
+//       throw err;
+//     });
+// });
+
+const connectWebex = () => {
   webex.meetings
     .register()
-    .then(() => console.log('Connected'))
+    .then(() => {
+      console.log('Connected');
+      listenForIncomingMeetings();
+    })
     .catch((err) => {
       console.error(err);
       alert(err);
       throw err;
     });
-});
+};

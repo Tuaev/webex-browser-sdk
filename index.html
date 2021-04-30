@@ -9,8 +9,8 @@
 </head>
 
 <body>
-  <h1>Meeting Quick Start</h1>
-  <p>This sample demonstrates how to start a meeting using Webex JS-SDK in the browser.</p>
+  <h1>Meeting Video Call Demo</h1>
+  <p>Using the Webex Browser SDK</p>
 
   <form id="destination">
     <input id="invitee" name="invitee" placeholder="Person ID or Email Address or SIP URI or Room ID" type="text" />
@@ -25,8 +25,9 @@
     </div>
   </div>
 
-  <button id="connect" title="connect" type="button">Connect Webex</button>
+  <button onclick="connectWebex()" id="connect" title="connect" type="button">Connect Webex</button>
   <button onclick='answerMeeting(this)' id="answer" title="answer" type="button">Answer Call</button>
+  <button onclick='rejectMeeting(this)' id="reject" title="reject" type="button">Reject Call</button>
   <button id="hangup" title="hangup" type="button">cancel/hangup</button>
 
   <script crossorigin src="https://unpkg.com/webex@^1/umd/webex.min.js"></script>
