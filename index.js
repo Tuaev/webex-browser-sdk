@@ -1,6 +1,6 @@
 // Development token lasts 12 hours
 const ACCESS_TOKEN =
-  'NjBlOGJiNDItM2YwYS00ZDczLTk4OTQtY2MxNjc3MzY2MWYxZjRkMmE0OTYtNzdi_PE93_23df57c9-c698-4101-9d39-db7aac8ecafd';
+  'MTYzNGFlMDUtYzM3Yi00YWRhLWEzNWYtZmU0MTkxYzAyMmVlMTI4MWJhYmEtNDA5_PE93_23df57c9-c698-4101-9d39-db7aac8ecafd';
 
 const webex = window.Webex.init({
   credentials: {
@@ -8,27 +8,31 @@ const webex = window.Webex.init({
   },
 });
 
-function listenForIncomingMeetings() {
+const toggleDisplay = (elementId, status) => {
+  const element = document.getElementById(elementId);
+  if (status) {
+    element.classList.remove('visually-hidden');
+  } else {
+    element.classList.add('visually-hidden');
+  }
+};
+
+const listenForIncomingMeetings = () => {
   return new Promise((resolve) => {
     // Listen for added meetings
-    webex.meetings.on('meeting:added', (addedMeetingEvent) => {
-      if (addedMeetingEvent.type === 'INCOMING' || addedMeetingEvent.type === 'JOIN') {
-        const addedMeeting = addedMeetingEvent.meeting;
+    webex.meetings.on('meeting:added', (m) => {
+      const { type } = m;
 
-        // Acknowledge to the server that we received the call on our device
-        addedMeeting.acknowledge(addedMeetingEvent.type).then(() => {
-          if (confirm('Answer incoming call')) {
-            bindMeetingEvents(addedMeeting);
-            joinMeeting(addedMeeting);
-          } else {
-            addedMeeting.decline();
-          }
-        });
+      if (type === 'INCOMING') {
+        const newMeeting = m.meeting;
+
+        toggleDisplay('incomingsection', true);
+        newMeeting.acknowledge(type);
       }
     });
     resolve();
   });
-}
+};
 
 const bindMeetingEvents = (meeting) => {
   meeting.on('error', (err) => console.error(err));
@@ -110,6 +114,7 @@ const answerMeeting = () => {
       bindMeetingEvents(meeting);
       return joinMeeting(meeting);
     });
+    toggleDisplay('incomingsection', false);
   }
 };
 
@@ -120,6 +125,7 @@ const rejectMeeting = () => {
   if (meeting) {
     meeting.decline('BUSY');
   }
+  toggleDisplay('incomingsection', false);
 };
 
 document.querySelector('#destination').addEventListener('submit', (e) => {
